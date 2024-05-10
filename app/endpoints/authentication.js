@@ -2,7 +2,8 @@ const express = require('express');
 const router = express.Router();
 const {signup,login,logout} = require('../api/authentication.api');
 const {authorization} = require('../middleware/auth/authorization');
-const {RequestValidationError} = require('@sumanauth/common');
+const {ValidRequest} = require('@sumanauth/common');
+const valid = require('../validation/authentication.dt');
 /**
  * @swagger
  * /api/v1/signup:
@@ -42,26 +43,12 @@ const {RequestValidationError} = require('@sumanauth/common');
  *         description: Internal server error.
  */
 
-router.post('/signup',async(req,res)=>{
-    // signup(req.body).then(val=>{
-    //     res.status(200).send(val);
-    // }).catch(err=>{
-    //     res.send(err)
-    // })
-
-    try {
-        const result = await signup(req.body);
-        res.status(200).send(result);
-    } catch (error) {
-        console.error("Error during signup:", error);
-        if (error instanceof RequestValidationError) {
-            // Handle validation errors
-            res.status(400).send("Bad request. Invalid input data.");
-        } else {
-            // Handle other errors
-            res.status(500).send("Internal server error.");
-        }
-    }
+router.post('/signup',valid.signupDt,ValidRequest, async(req,res,next)=>{
+    signup(req.body).then(val=>{
+        res.status(200).send(val);
+    }).catch(err=>{
+        next(err)
+    })
 })
 /**
  * @swagger
@@ -106,11 +93,11 @@ router.post('/signup',async(req,res)=>{
  *         description: Internal server error.
  */
 
-router.post('/login',async(req,res)=>{
+router.post('/login',valid.loginDt,ValidRequest,async(req,res,next)=>{
     login(req.body).then(val=>{
         res.status(200).send(val);
     }).catch(err=>{
-        res.send(err)
+        next(err);
     })
 })
 /**
@@ -141,11 +128,11 @@ router.post('/login',async(req,res)=>{
  *       '500':
  *         description: Internal server error.
  */
-router.post('/logout',authorization,async(req,res)=>{
+router.post('/logout',authorization,async(req,res,next)=>{
     logout(req.authdata).then(val=>{
         res.status(200).send(val);
     }).catch(err=>{
-        res.send(err)
+        next(err);
     })
 })
 

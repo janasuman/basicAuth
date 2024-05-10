@@ -7,7 +7,7 @@ const helmet = require('helmet');
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('../docs/swagger');
 const auth = require('./endpoints/authentication');
-
+const {errorHandler} = require('@sumanauth/common');
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
 	limit: 10000, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
@@ -19,9 +19,9 @@ const limiter = rateLimit({
 app.use(cros());
 app.use(helmet());
 app.use(limiter);
-app.use(json())
+app.use(json());
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-app.use('/api/v1',auth)
+app.use('/api/v1',auth);
 /**
  * @openapi
  * /:
@@ -34,5 +34,6 @@ app.use('/api/v1',auth)
 app.get('/',(req,res)=>{
 	res.send(`Welcome to server ${process.env.PORT || '3000'}`);
 })
+app.use(errorHandler);
 
 module.exports = app;

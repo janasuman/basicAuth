@@ -1,4 +1,4 @@
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
 const Session = require('../../models/session');
 const authorization = (req,res,next)=>{
 	const token = req.header('Authorization');
@@ -15,7 +15,7 @@ const authorization = (req,res,next)=>{
 			SessionId:user.SessionId
 		}
 	  });
-	  if (!sess) throw new Error('Session does not exist')
+	  if (!sess) return res.status(403).json({ message:'Session does not exist'});
 	  req.authdata = user;
 	  next();
 	});

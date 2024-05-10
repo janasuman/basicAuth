@@ -19,6 +19,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - 3000:3000
+    env_file:
+      - .env.uat
     container_name: backend
     depends_on:
       - db

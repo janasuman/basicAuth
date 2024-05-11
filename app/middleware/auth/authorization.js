@@ -18,7 +18,7 @@ const authorization = async (req, res, next) => {
 
     jwt.verify(token.split(" ")[1], process.env.JWT_KEY, async (err, user) => {
         if (err) {
-            return res.status(403).json({ message: 'Forbidden' });
+            return res.status(401).json({ message: 'Invalid token' });
         }
         const sess = await Session.findOne({
             where: {

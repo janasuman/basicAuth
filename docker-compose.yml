@@ -15,14 +15,21 @@ services:
 
   backend:
     build:
-      context: .
+      context: backend
       dockerfile: Dockerfile
     ports:
       - 3000:3000
     env_file:
-      - .env.uat
+      - backend/.env.uat
     container_name: backend
     depends_on:
       - db
+  frontend:
+    build:
+      context: frontend
+      dockerfile: Dockerfile
+    ports:
+      - 80:80
+    container_name: frontend
 volumes:
   db_data:

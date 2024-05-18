@@ -4,11 +4,17 @@ const Session = require('../models/session');
 
 const conncetDB = async ()=>{
     await db_conn.authenticate();
-    await db_conn.sync();
-    await db_conn.sync({ force: process.env.IS_SYNC ==="true" });
+    if (process.env.IS_SYNC ==="true") await dbSync();
+    // await db_conn.sync({ force: process.env.IS_SYNC ==="true" });
     console.log('Connection has been established successfully');
 }
 
+const dbSync = async() =>{
+    await db_conn.sync({force:true});
+    return 'Database recreated'
+}
+
 module.exports = {
-    conncetDB
+    conncetDB,
+    dbSync
 }

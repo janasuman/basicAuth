@@ -21,13 +21,16 @@ export class LoginComponent implements OnInit, OnDestroy {
   loginSubscription: Subscription | undefined;
   errorSubscription: Subscription | undefined;
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+  ) {}
 
   ngOnInit(): void {
     this.loginSubscription = this.authService
       .getLoginResponse()
       .subscribe((res) => {
-        alert('login successfull');
+        // alert('login successfull');
         this.router.navigate(['home']);
       });
 

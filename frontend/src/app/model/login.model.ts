@@ -6,3 +6,7 @@ export interface loginReq{
 export interface loginResponse{
     Token:string
 }
+
+export interface logOutResponse{
+    message:string
+}

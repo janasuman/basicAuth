@@ -72,7 +72,8 @@ const logout = async(authdata) =>{
                 SessionId:authdata.SessionId
             }
         });
-        return 'User logout successfuly';
+        const message = 'User logout successfuly';
+        return {message};
     } catch (err) {
        throw new CustomError(err.message);
     }

@@ -1,6 +1,12 @@
 pipeline {
     agent any
 
+    environment {
+        FRONTEND_PATH = "frontend"  // Replace with the actual path to your frontend directory
+        BACKEND_PATH = "backend"    // Replace with the actual path to your backend directory
+        DEPLOY_PATH = "/path/to/deploy"  // Replace with the actual deployment path
+    }
+
     stages {
         stage('Clone Repository') {
             steps {
@@ -9,31 +15,55 @@ pipeline {
             }
         }
 
-        stage('Install Dependencies') {
+        stage('Install Frontend Dependencies') {
             steps {
-                echo 'Installing npm dependencies...'
-                sh 'npm install'
+                dir(env.FRONTEND_PATH) {
+                    echo 'Installing frontend npm dependencies...'
+                    sh 'npm install'
+                }
             }
         }
 
-        stage('Build') {
+        stage('Install Backend Dependencies') {
             steps {
-                echo 'Building the project...'
-                sh 'npm run build' // Replace with your actual build command
+                dir(env.BACKEND_PATH) {
+                    echo 'Installing backend npm dependencies...'
+                    sh 'npm install'
+                }
+            }
+        }
+
+        stage('Build Frontend') {
+            steps {
+                dir(env.FRONTEND_PATH) {
+                    echo 'Building the frontend project...'
+                    sh 'npm start' // Replace with your actual frontend build command
+                }
+            }
+        }
+
+        stage('Build Backend') {
+            steps {
+                dir(env.BACKEND_PATH) {
+                    echo 'Building the backend project...'
+                    sh 'npm start' // Replace with your actual backend build command
+                }
             }
         }
 
         stage('Deploy') {
             steps {
                 echo 'Deploying to server...'
-                // Uncomment and configure the sshagent block with your credentials ID
-                // sshagent(credentials: ['deploy-key']) {
-                //     sh """
-                //         ssh $DEPLOY_USER@$DEPLOY_SERVER 'mkdir -p $DEPLOY_PATH'
-                //         rsync -avz --delete . $DEPLOY_USER@$DEPLOY_SERVER:$DEPLOY_PATH
-                //         ssh $DEPLOY_USER@$DEPLOY_SERVER 'cd $DEPLOY_PATH && npm install --production && pm2 restart all' // Adjust the command as needed
-                //     """
-                // }
+                // Assuming frontend and backend build outputs are in dist or build directories
+                // sh """
+                //     mkdir -p ${env.DEPLOY_PATH}/frontend
+                //     mkdir -p ${env.DEPLOY_PATH}/backend
+                //     rsync -avz --delete ${env.FRONTEND_PATH}/dist/ ${env.DEPLOY_PATH}/frontend
+                //     rsync -avz --delete ${env.BACKEND_PATH}/dist/ ${env.DEPLOY_PATH}/backend
+                //     cd ${env.DEPLOY_PATH}/backend
+                //     npm install --production
+                //     pm2 restart all
+                // """
             }
         }
     }

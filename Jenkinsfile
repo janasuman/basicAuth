@@ -1,104 +1,52 @@
 pipeline {
     agent any
 
-    environment {
-        // Define environment variables if needed
-    }
-
     stages {
-        stage('Checkout') {
+        stage('Clone Repository') {
             steps {
-                // Checkout your code from the repository
-                checkout scm
+                echo 'Cloning repository...'
+                git 'git@github.com:janasuman/basicAuth.git'
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                echo 'Installing npm dependencies...'
+                sh 'npm install'
             }
         }
 
         stage('Build') {
-            parallel {
-                stage('Build Frontend') {
-                    steps {
-                        script {
-                            // Build the frontend Docker image
-                            sh 'cd frontend && docker-compose build'
-                        }
-                    }
-                }
-                stage('Build Backend') {
-                    steps {
-                        script {
-                            // Build the backend Docker image
-                            sh 'cd backend && docker-compose build'
-                        }
-                    }
-                }
-                stage('Build Database') {
-                    steps {
-                        script {
-                            // Build the database Docker image if applicable
-                            sh 'cd database && docker-compose build'
-                        }
-                    }
-                }
-            }
-        }
-
-        stage('Test') {
-            parallel {
-                stage('Test Frontend') {
-                    steps {
-                        script {
-                            // Run frontend tests
-                            sh 'cd frontend && docker-compose run --rm frontend-container npm run test'
-                        }
-                    }
-                }
-                stage('Test Backend') {
-                    steps {
-                        script {
-                            // Run backend tests
-                            sh 'cd backend && docker-compose run --rm backend-container ./gradlew test'
-                        }
-                    }
-                }
-                stage('Test Database') {
-                    steps {
-                        script {
-                            // Run database tests if applicable
-                            sh 'cd database && docker-compose run --rm database-container ./test-database.sh'
-                        }
-                    }
-                }
+            steps {
+                echo 'Building the project...'
+                sh 'npm run build' // Replace with your actual build command
             }
         }
 
         stage('Deploy') {
             steps {
-                script {
-                    // Deploy all services using Docker Compose
-                    sh 'docker-compose -f docker-compose.production.yml up -d'
-                }
+                echo 'Deploying to server...'
+                // sshagent(credentials: ['deploy-key']) {
+                //     sh """
+                //         ssh $DEPLOY_USER@$DEPLOY_SERVER 'mkdir -p $DEPLOY_PATH'
+                //         rsync -avz --delete . $DEPLOY_USER@$DEPLOY_SERVER:$DEPLOY_PATH
+                //         ssh $DEPLOY_USER@$DEPLOY_SERVER 'cd $DEPLOY_PATH && npm install --production && pm2 restart all' // Adjust the command as needed
+                //     """
+                // }
             }
         }
     }
 
     post {
         always {
-            script {
-                // Cleanup actions, notifications, etc.
-                echo 'Pipeline execution finished.'
-            }
+            echo 'Cleaning workspace...'
+            cleanWs()
         }
         success {
-            script {
-                // Actions on success
-                echo 'Pipeline execution succeeded.'
-            }
+            echo 'Deployment successful'
         }
         failure {
-            script {
-                // Actions on failure
-                echo 'Pipeline execution failed.'
-            }
+            echo 'Deployment failed'
         }
     }
 }

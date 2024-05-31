@@ -1,6 +1,14 @@
 pipeline {
     agent any
 
+    stages {
+        stage('Clone Repository') {
+            steps {
+                echo 'Cloning repository...'
+                git branch: 'main', url: 'git@github.com:janasuman/basicAuth.git'
+            }
+        }
+
         stage('Install Dependencies') {
             steps {
                 echo 'Installing npm dependencies...'
@@ -18,6 +26,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 echo 'Deploying to server...'
+                // Uncomment and configure the sshagent block with your credentials ID
                 // sshagent(credentials: ['deploy-key']) {
                 //     sh """
                 //         ssh $DEPLOY_USER@$DEPLOY_SERVER 'mkdir -p $DEPLOY_PATH'

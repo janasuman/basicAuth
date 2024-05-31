@@ -1,14 +1,6 @@
 pipeline {
     agent any
 
-    stages {
-        stage('Clone Repository') {
-            steps {
-                echo 'Cloning repository...'
-                git 'git@github.com:janasuman/basicAuth.git'
-            }
-        }
-
         stage('Install Dependencies') {
             steps {
                 echo 'Installing npm dependencies...'
